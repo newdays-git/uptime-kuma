@@ -1,0 +1,40 @@
+name: Uptime Kuma Setup
+
+on:
+  push:
+    branches:
+      - main  # トリガーするブランチを指定してください
+
+jobs:
+  setup_and_run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14  # 使用する Node.js のバージョンを指定してください
+
+      - name: Install npm
+        run: npm install npm -g
+
+      - name: Install PM2
+        run: npm install pm2 -g && pm2 install pm2-logrotate
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./uptime-kuma
+
+      - name: Build Uptime Kuma
+        run: npm run setup
+        working-directory: ./uptime-kuma
+
+      - name: Start Uptime Kuma using PM2
+        run: pm2 start server/server.js --name uptime-kuma
+        working-directory: ./uptime-kuma
+
+      # このセクションは必要に応じてカスタマイズしてください
+      # テストやデプロイなどの追加のステップを含めることができます
